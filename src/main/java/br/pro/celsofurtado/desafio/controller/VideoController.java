@@ -4,11 +4,11 @@ import br.pro.celsofurtado.desafio.model.Video;
 import br.pro.celsofurtado.desafio.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,12 +31,39 @@ public class VideoController {
 
     @GetMapping("/videos/{id}")
     public ResponseEntity<Video> findVideoById(@PathVariable Long id) {
+
         Optional<Video> optionalVideo = videoService.findVideoById(id);
-        if(optionalVideo.isPresent()) {
+
+        if (optionalVideo.isPresent()) {
             return ResponseEntity.ok(optionalVideo.get());
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
+
+    }
+
+    @PostMapping("/videos")
+    public ResponseEntity<Video> save(@RequestBody @Valid Video video, UriComponentsBuilder uriComponentsBuilder) {
+
+        Video newVideo = videoService.save(video);
+        URI uri = uriComponentsBuilder.path("/api/videos/{id}").buildAndExpand(newVideo.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(newVideo);
+
+    }
+
+    @DeleteMapping("/videos/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
+
+        Optional<Video> video = videoService.findVideoById(id);
+
+        if (video.isPresent()) {
+            videoService.delete(id);
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.notFound().build();
+
     }
 
 }

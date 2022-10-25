@@ -4,7 +4,6 @@ import br.pro.celsofurtado.desafio.model.Video;
 import br.pro.celsofurtado.desafio.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +19,14 @@ public class VideoService {
 
     public Optional<Video> findVideoById(Long id) {
         return videoRepository.findById(id);
+    }
+
+    public Video save(Video video) {
+        return videoRepository.save(video);
+    }
+
+    public void delete(Long id) {
+        videoRepository.deleteById(id);
     }
 
 }
